@@ -38,26 +38,81 @@ def efficient_return(target_return):
                           method='SLSQP', bounds=bounds_, constraints=constraints)
     return result
 
-# Minimum variance portfolio
-min_var_result = minimum_variance()
-min_var_vol = min_var_result.fun
-min_var_ret = return_(min_var_result.x, mu)
+def analytical_efficient_frontier(mu_vec, sigma_mat, target_returns):
+    """
+    Wyznacza analityczną granicę efektywną (dopuszczająca krótką sprzedaż)
+    za pomocą metody mnożników Lagrange'a z użyciem numpy.linalg.solve.
+    """
+    mu_np = np.array(mu_vec)
+    sigma_np = np.array(sigma_mat)
+    ones = np.ones_like(mu_np)
+    
+    # Rozwiązanie układów równań w celu stabilnego wyznaczenia Sigma^-1 * mu i Sigma^-1 * 1
+    g1 = np.linalg.solve(sigma_np, mu_np)
+    g2 = np.linalg.solve(sigma_np, ones)
+    
+    # Parametry analityczne granicy
+    A = np.dot(mu_np, g1)
+    B = np.dot(mu_np, g2)
+    C = np.dot(ones, g2)
+    D = A * C - B**2
+    
+    risks = []
+    for r in target_returns:
+        var = (C * r**2 - 2 * B * r + A) / D
+        risks.append(np.sqrt(var))
+        
+    return np.array(risks)
 
-# Efficient frontier
-target_returns = np.linspace(min_var_ret, mu.max(), 50)
-frontier_volatility = []
 
-for target in target_returns:
-    opt_result = efficient_return(target)
-    frontier_volatility.append(opt_result.fun)
+def analytical_portfolio_weights(mu_vec, sigma_mat, target_return):
+    """
+    Wyznacza wagi portfela dla stopy docelowej przy użyciu mnożników Lagrange'a
+    (krótka sprzedaż dozwolona).
+    """
+    mu_np = np.array(mu_vec)
+    sigma_np = np.array(sigma_mat)
+    ones = np.ones_like(mu_np)
+    
+    g1 = np.linalg.solve(sigma_np, mu_np)
+    g2 = np.linalg.solve(sigma_np, ones)
+    
+    A = np.dot(mu_np, g1)
+    B = np.dot(mu_np, g2)
+    C = np.dot(ones, g2)
+    D = A * C - B**2
+    
+    lambda1 = (C * target_return - B) / D
+    lambda2 = (A - B * target_return) / D
+    
+    return lambda1 * g1 + lambda2 * g2
 
-# Plot
-plt.figure(figsize=(10, 6))
-plt.plot(frontier_volatility, target_returns, 'b', label='Efficient Frontier')
-plt.scatter(min_var_vol, min_var_ret, color='r', label='Minimum Variance Portfolio')
-plt.title('Markowitz Efficient Frontier')
-plt.xlabel('Annualized Volatility')
-plt.ylabel('Annualized Return')
-plt.legend()
-plt.grid(True, alpha=0.5)
-plt.show()
+
+if __name__ == "__main__":
+    # Portfel minimalnej wariancji
+    min_var_result = minimum_variance()
+    min_var_vol = min_var_result.fun
+    min_var_ret = return_(min_var_result.x, mu)
+
+    # Numeryczna granica efektywna (z ograniczeniem braku krótkiej sprzedaży: w_i >= 0)
+    target_returns = np.linspace(min_var_ret, mu.max(), 50)
+    frontier_volatility = []
+
+    for target in target_returns:
+        opt_result = efficient_return(target)
+        frontier_volatility.append(opt_result.fun)
+
+    # Analityczna granica efektywna (z dozwoloną krótką sprzedażą)
+    analytical_volatility = analytical_efficient_frontier(mu, sigma, target_returns)
+
+    # Rysowanie wykresu porównawczego
+    plt.figure(figsize=(10, 6))
+    plt.plot(frontier_volatility, target_returns, 'b-', linewidth=2, label='Granica numeryczna (w >= 0)')
+    plt.plot(analytical_volatility, target_returns, 'g--', linewidth=2, label='Granica analityczna Lagrange\'a (krótka sprzedaż dozwolona)')
+    plt.scatter(min_var_vol, min_var_ret, color='r', s=80, zorder=5, label='Portfel min. wariancji (numeryczny)')
+    plt.title('Porównanie klasycznych granic efektywnych Markowitza')
+    plt.xlabel('Roczna zmienność (odchylenie standardowe)')
+    plt.ylabel('Roczna oczekiwana stopa zwrotu')
+    plt.legend()
+    plt.grid(True, alpha=0.3)
+    plt.show()

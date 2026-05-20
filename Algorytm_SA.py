@@ -5,38 +5,37 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import os
 
+import data_loader
+
 rng = np.random.default_rng(12345)
 
-portfolio_dir = os.path.join(os.path.dirname(__file__), 'Portfolio-optimization')
-csv_path = os.path.join(portfolio_dir, 'dane.csv')
-
-df = pd.read_csv(csv_path, header=[0, 1], index_col=0)
-
-prices = df["Close"]
-log_ret = (np.log(prices / prices.shift(1))).dropna()
-
-mu = log_ret.mean() * 252
-sigma = log_ret.cov() * 252
-
+mu = data_loader.mu
+sigma = data_loader.sigma
 num_stocks = len(mu)
 
-print(f"Liczba akcji: {num_stocks}")
-print(f"Średnie zwroty:\n{mu}")
-print(f"\nMacierz kowariancji:\n{sigma}")
+if __name__ == "__main__":
+    print(f"Liczba akcji: {num_stocks}")
+    print(f"Średnie zwroty:\n{mu}")
+    print(f"\nMacierz kowariancji:\n{sigma}")
 
-# hermonogram chlodzenia 
+
+# harmonogram chłodzenia
 def geometric_cooling(T0, alpha, k):
     return T0 * (alpha ** k)
 
-# regula metropolisa (minimalizacja)
+# reguła Metropolisa (minimalizacja)
 def metropolis_accept(delta, T, rng):
+    """Kryterium akceptacji Metropolisa dla minimalizacji."""
     if delta <= 0:
         return True
     if T <= 0:
         return False
+    # Zabezpieczenie przed overflow przy dzieleniu przez skrajnie małe T
+    if delta > 700.0 * T:
+        return False
     return rng.random() < np.exp(-delta / T)
 
-# projekcja wektora w na sympleks (algorytm duchi)
+# projekcja wektora w na sympleks (algorytm Duchi)
 def project_simplex(w):
     n = len(w)
     w_sorted = np.sort(w)[::-1]
@@ -52,7 +51,7 @@ def project_simplex(w):
     
     return w_proj
 
-# funkcja celu dla optymalizacji portfela (min wariancje oraz kara za niedostarczenie docelowego zwrotu)
+# funkcja celu: minimalizacja wariancji z karą za niedostarczenie docelowego zwrotu
 def portfolio_objective_with_shortfall(weights, mu, sigma, target_return=0.0, penalty=1000.0):
     portfolio_return = np.dot(weights, mu)
     portfolio_variance = weights @ sigma @ weights
@@ -141,17 +140,18 @@ def symulowane_wyzarzanie_portfel(
 
 # wykres zbieznosci funkcji celu
 def plot_convergence(history_f, history_best_f, title, filename='convergence.png'):
-    plt.figure(figsize=(10, 5))
-    plt.plot(history_f, label="wartość bieżąca", alpha=0.7)
-    plt.plot(history_best_f, label="najlepsza dotąd", linewidth=2)
-    plt.xlabel("Iteracja")
-    plt.ylabel("Wartość funkcji celu")
-    plt.title(title)
-    plt.grid(True, alpha=0.3)
-    plt.legend()
-    plt.tight_layout()
-    plt.savefig(filename, dpi=150, bbox_inches='tight')
-    plt.close()
+    fig, ax = plt.subplots(figsize=(10, 5))
+    ax.plot(history_f, label="wartość bieżąca", alpha=0.6, linewidth=0.8)
+    ax.plot(history_best_f, label="najlepsza dotąd", linewidth=2)
+    ax.set_yscale('log')
+    ax.set_xlabel("Iteracja")
+    ax.set_ylabel("Wartość funkcji celu (skala log)")
+    ax.set_title(title)
+    ax.grid(True, which='both', alpha=0.3)
+    ax.legend()
+    fig.tight_layout()
+    fig.savefig(filename, dpi=150, bbox_inches='tight')
+    plt.close(fig)
 
 # wykres harmonogramu temp
 def plot_temperature(history_T, title, filename='temperature.png'):

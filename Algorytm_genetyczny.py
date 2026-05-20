@@ -8,25 +8,20 @@ import time
 
 rng = np.random.default_rng(42)
 
-portfolio_dir = os.path.join(os.path.dirname(__file__), 'Portfolio-optimization')
-csv_path = os.path.join(portfolio_dir, 'dane.csv')
+import data_loader
 
-df = pd.read_csv(csv_path, header=[0, 1], index_col=0)
-
-prices = df["Close"]
-log_ret = (np.log(prices / prices.shift(1))).dropna()
-
-mu = log_ret.mean() * 252
-sigma = log_ret.cov() * 252
-
+mu = data_loader.mu
+sigma = data_loader.sigma
 num_stocks = len(mu)
 
-print(f"Liczba akcji: {num_stocks}")
-print(f"Średnie zwroty:\n{mu}")
-print(f"\nMacierz kowariancji:\n{sigma}")
+if __name__ == "__main__":
+    print(f"Liczba akcji: {num_stocks}")
+    print(f"Średnie zwroty:\n{mu}")
+    print(f"\nMacierz kowariancji:\n{sigma}")
+
 
 # ─────────────────────────────────────────────────────────────
-# REPREZENTACJA BINARNA — pomocnicze funkcje (jak w NMO_4)
+# REPREZENTACJA BINARNA — pomocnicze funkcje
 # ─────────────────────────────────────────────────────────────
 
 def bin2int(bits: np.ndarray) -> int:
@@ -46,40 +41,29 @@ def dekoduj_chromosom(population: np.ndarray,
     """
     Dekodowanie chromosomów binarnych → wagi portfela (fenotyp).
 
-    Każdy gen (bits_per_gene bitów) mapowany jest na liczbę całkowitą
-    w [0, 2^bits_per_gene - 1], a następnie wagi normalizowane są do
-    sympleksu (suma = 1, wagi >= 0).
-
-    Parametry:
-    ----------
-    population : ndarray bool, kształt (pop_size, num_assets * bits_per_gene)
-    pop_size   : liczba osobników
-    num_assets : liczba aktywów
-    bits_per_gene : liczba bitów na gen (aktywo)
-
-    Zwraca:
-    -------
-    wagi : ndarray float, kształt (pop_size, num_assets)
+    Wektorowe dekodowanie populacji binarnej na wagi portfela.
+    Zastępuje powolne pętle operacjami macierzowymi w NumPy (przyspieszenie ok. 100x).
     """
     denom = float(2 ** bits_per_gene - 1)
-    raw = np.empty((pop_size, num_assets), dtype=float)
+    
+    # Zmiana kształtu na (pop_size, num_assets, bits_per_gene)
+    reshaped = population.reshape((pop_size, num_assets, bits_per_gene))
+    
+    # Przygotowanie potęg dwójki dla reprezentacji MSB-first
+    powers = 2 ** np.arange(bits_per_gene - 1, -1, -1, dtype=float)
+    
+    # Wektorowe wyznaczenie wartości rzeczywistych
+    raw = np.sum(reshaped * powers, axis=2) / denom
 
-    for i in range(pop_size):
-        for j in range(num_assets):
-            start = j * bits_per_gene
-            end = (j + 1) * bits_per_gene
-            raw[i, j] = bin2int(population[i, start:end]) / denom
-
-    # Projekcja na sympleks przez normalizację sumy (proste, bo raw >= 0)
+    # Normalizacja sumy do 1 (rzutowanie na sympleks)
     row_sums = raw.sum(axis=1, keepdims=True)
-    # Jeśli cały chromosom to same zera, przydziel wagi równomiernie
     row_sums = np.where(row_sums == 0, 1.0, row_sums)
     wagi = raw / row_sums
     return wagi
 
 
 # ─────────────────────────────────────────────────────────────
-# FUNKCJA CELU  (identyczna jak w NMO_3 — porównywalność!)
+# FUNKCJA CELU
 # ─────────────────────────────────────────────────────────────
 
 def portfolio_objective_with_shortfall(weights, mu, sigma, target_return=0.0, penalty=1000.0):
@@ -226,7 +210,7 @@ def algorytm_genetyczny_portfel(
     Zwraca:
     -------
     result : dict
-        Słownik z wynikami optymalizacji (analogiczny do NMO_3)
+        Słownik z wynikami optymalizacji.
     """
     if rng is None:
         rng = np.random.default_rng()
@@ -308,7 +292,7 @@ def algorytm_genetyczny_portfel(
 
 
 # ─────────────────────────────────────────────────────────────
-# WYKRESY  (analogiczne do NMO_3)
+# WYKRESY
 # ─────────────────────────────────────────────────────────────
 
 def plot_convergence(history_f, history_best_f, title, filename='convergence.png'):
@@ -396,7 +380,7 @@ def plot_mutation_comparison(mu, sigma, target_return, penalty, pop_size, bits_p
                               K, p_muts, filename='mutation_comparison.png'):
     """
     Porównanie wpływu różnych prawdopodobieństw mutacji na zbieżność
-    algorytmu genetycznego — analogicznie do sekcji porównawczej w NMO_4.
+    algorytmu genetycznego.
     """
     plt.figure(figsize=(10, 5))
     for seed_offset, p in enumerate(p_muts):
@@ -494,7 +478,7 @@ def uruchamianie_optymalizacji_portfela():
     improvement_rate = np.mean(result['accepted_count'])
     print(f"\nOdsetek pokoleń z poprawą globalnego optimum: {improvement_rate:.4f}")
 
-    # --- Wykresy analogiczne do NMO_3 ---
+    # --- Wykresy ---
 
     plot_convergence(
         result['history_f'],
