@@ -14,7 +14,7 @@ mu = data_loader.mu
 sigma = data_loader.sigma
 num_stocks = len(mu)
 
-AG_GRAPHS_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'ag_graphs')
+AG_GRAPHS_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'graphs', 'ga')
 os.makedirs(AG_GRAPHS_DIR, exist_ok=True)
 
 if __name__ == "__main__":

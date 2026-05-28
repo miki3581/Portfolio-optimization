@@ -1,8 +1,8 @@
-# Raport z części 4
+# 5. Zintegrowana Analiza Porównawcza Algorytmów
 
-## 1. Cel i zakres prac
+## 5.1. Cel i zakres prac
 
-Zgodnie z podziałem obowiązków, główne zadania obejmowały:
+Ostatnim etapem prac badawczych była integracja stworzonych metaheurystyk w jedno spójne środowisko testowe w celu przeprowadzenia kompleksowej analizy porównawczej. Główne zadania zrealizowane w tej części obejmowały:
 
 1. **Zintegrowanie** implementacji Symulowanego Wyżarzania (SA) i Algorytmu Genetycznego (GA) w jedno spójne środowisko testowe.
 2. **Przeprowadzenie analizy porównawczej (Grid Search)** dla wybranych hiperparametrów obu metod:
@@ -17,9 +17,9 @@ Wszystkie zadania zostały zrealizowane w skrypcie `Analiza_porownawcza.py`.
 
 ---
 
-## 2. Opis implementacji (`Analiza_porownawcza.py`)
+## 5.2. Opis implementacji i integracji modułów
 
-### 2.1. Integracja modułów
+### 5.2.1. Metodologia integracji
 
 Skrypt importuje funkcje optymalizacyjne bezpośrednio z plików grupy:
 
@@ -32,14 +32,14 @@ Skrypt importuje funkcje optymalizacyjne bezpośrednio z plików grupy:
 
 Oba algorytmy przyjmują ustandaryzowany interfejs: `(mu, sigma, target_return, penalty, ..., rng)`. Ziarno losowości (`rng`) jest zawsze przekazywane jawnie — gwarantuje to **powtarzalność wyników**.
 
-### 2.2. Benchmark klasyczny (Granica efektywna)
+### 5.2.2. Benchmark klasyczny (Granica efektywna)
 
 Na wykresie ryzyko–zwrot naniesione są dwie granice efektywne z modułu `markovitz.py`:
 
 - **Numeryczna** (scipy SLSQP, $w_i \ge 0$) — realistyczny benchmark bez krótkiej sprzedaży.
 - **Analityczna** (metoda mnożników Lagrange'a, $\Sigma^{-1}$ wyznaczane przez `numpy.linalg.solve`) — granica teoretyczna, dopuszczająca krótką sprzedaż; stanowi dolne ograniczenie ryzyka.
 
-### 2.3. Grid Search (Strojenie Hiperparametrów)
+### 5.2.3. Grid Search (Strojenie Hiperparametrów)
 
 #### Symulowane wyżarzanie — współczynnik chłodzenia $\alpha$
 
@@ -75,7 +75,7 @@ Zaobserwowane zależności:
 - Najlepszy wynik uzyskała populacja 150 osobników — stanowi dobry kompromis między czasem obliczeń a jakością.
 - Większa populacja (`pop_size = 300`) nie poprawiła wyniku przy 250 pokoleniach — prawdopodobnie potrzebuje więcej generacji do pełnego wykorzystania swojej różnorodności.
 
-### 2.4. Analiza wrażliwości
+### 5.2.4. Analiza wrażliwości
 
 Funkcja `run_sensitivity_analysis()` uruchamia najlepsze konfiguracje SA ($\alpha = 0{,}90$) i GA ($pop\_size = 150$) na 5 ziarnach losowości (`{16, 123, 234, 2026, 9999}`). Raportowane są: średnia, odchylenie standardowe, najlepszy i najgorszy wynik funkcji celu.
 
@@ -84,7 +84,7 @@ Funkcja `run_sensitivity_analysis()` uruchamia najlepsze konfiguracje SA ($\alph
 | SA | 0.034803 | 0.000011 | 0.034787 | 0.034821 |
 | GA | 0.035239 | 0.000213 | 0.035019 | 0.035628 |
 
-### 2.5. Wykresy (`generate_comparison_plots`)
+### 5.2.5. Analiza wizualna (Wykresy porównawcze)
 
 #### `porownanie_zbieznosci.png`
 
@@ -101,17 +101,17 @@ Klasyczny wykres ryzyko–zwrot (płaszczyzna $\sigma$–$\mu$) zawierający:
 
 ---
 
-## 3. Pliki wyjściowe
+## 5.3. Pliki wyjściowe i struktura katalogów
 
 | Plik | Opis |
 | :--- | :--- |
-| `porownanie_zbieznosci.png` | Zbieżność funkcji celu (skala log, znormalizowana oś X) |
-| `porownanie_granica.png` | Granice efektywne i wyniki SA/GA na płaszczyźnie ryzyko–zwrot |
+| `graphs/compare/porownanie_zbieznosci.png` | Zbieżność funkcji celu (skala log, znormalizowana oś X) |
+| `graphs/compare/porownanie_granica.png` | Granice efektywne i wyniki SA/GA na płaszczyźnie ryzyko–zwrot |
 | `tabele_wynikow.md` | Tabele liczbowe z wynikami grid search, analizy wrażliwości i optymalnych wag |
 
 ---
 
-## 4. Główne wnioski z analizy
+## 5.4. Główne wnioski z analizy
 
 1. **Wpływ harmonogramu chłodzenia (SA):** W badanym zakresie ($\alpha \in [0{,}80,\ 0{,}995]$) różnice w jakości rozwiązania są minimalne (rzędu $10^{-5}$), co świadczy o odporności SA na dokładny dobór tempa chłodzenia — o ile mieści się ono w rozsądnym przedziale. Zdecydowanie gorszy wynik dla $\alpha = 0{,}999$ wskazuje, że zbyt wolne chłodzenie jest poważnym problemem.
 

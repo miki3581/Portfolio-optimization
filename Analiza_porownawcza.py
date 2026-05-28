@@ -228,10 +228,13 @@ def generate_comparison_plots(mu, sigma, sa_results, ga_results):
     ax.set_ylabel("Wartość funkcji celu (skala log)", fontsize=10)
     ax.legend(frameon=True, facecolor="white", edgecolor="none")
     ax.grid(True, which="both", alpha=0.3, linestyle=":")
+    import os
+    os.makedirs('graphs/compare', exist_ok=True)
+    
     fig.tight_layout()
-    fig.savefig("porownanie_zbieznosci.png", dpi=150, bbox_inches="tight")
+    fig.savefig("graphs/compare/porownanie_zbieznosci.png", dpi=150, bbox_inches="tight")
     plt.close(fig)
-    print("[Wykresy] Zapisano: porownanie_zbieznosci.png")
+    print("[Wykresy] Zapisano: graphs/compare/porownanie_zbieznosci.png")
 
     # b) Wykres granic efektywnych
     print("[Wykresy] Wyznaczanie granicy numerycznej Markowitza (SciPy SLSQP) ...")
@@ -310,9 +313,9 @@ def generate_comparison_plots(mu, sigma, sa_results, ga_results):
     ax.legend(frameon=True, facecolor="white", edgecolor="none", loc="lower right")
     ax.grid(True, alpha=0.3, linestyle=":")
     fig.tight_layout()
-    fig.savefig("porownanie_granica.png", dpi=150, bbox_inches="tight")
+    fig.savefig("graphs/compare/porownanie_granica.png", dpi=150, bbox_inches="tight")
     plt.close(fig)
-    print("[Wykresy] Zapisano: porownanie_granica.png")
+    print("[Wykresy] Zapisano: graphs/compare/porownanie_granica.png")
 
 
 # 5. ZAPIS WYNIKÓW DO MARKDOWN
@@ -481,7 +484,7 @@ if __name__ == "__main__":
     print("\n" + "=" * 70)
     print("  ANALIZA ZAKOŃCZONA POMYŚLNIE")
     print("  Wygenerowane pliki:")
-    print("    - porownanie_zbieznosci.png")
-    print("    - porownanie_granica.png")
+    print("    - graphs/compare/porownanie_zbieznosci.png")
+    print("    - graphs/compare/porownanie_granica.png")
     print("    - tabele_wynikow.md")
     print("=" * 70)

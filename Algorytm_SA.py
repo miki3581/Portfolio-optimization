@@ -270,26 +270,29 @@ def uruchamianie_optymalizacji_portfela():
     print(f"\nWspółczynnik akceptacji: {acceptance_rate:.4f}")
     
     
+    import os
+    os.makedirs('graphs/sa', exist_ok=True)
+    
     plot_convergence(
         result['history_f'],
         result['history_best_f'],
         "Optymalizacja portfela: zbieżność funkcji celu",
-        filename='convergence.png'
+        filename='graphs/sa/convergence.png'
     )
     
     plot_temperature(
         result['history_T'],
         "Optymalizacja portfela: harmonogram temperatury",
-        filename='temperature.png'
+        filename='graphs/sa/temperature.png'
     )
     
     plot_weights(
         result['best_weights'],
         f"Optymalne wagi portfela (zwrot={result['best_return']:.4f}, ryzyko={result['best_risk']:.4f})",
-        filename='weights.png'
+        filename='graphs/sa/weights.png'
     )
     
-    plot_efficient_frontier_with_result(mu, sigma, result, n_points=30, filename='efficient_frontier.png')
+    plot_efficient_frontier_with_result(mu, sigma, result, n_points=30, filename='graphs/sa/efficient_frontier.png')
     
     
     return result

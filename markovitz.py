@@ -106,13 +106,17 @@ if __name__ == "__main__":
     analytical_volatility = analytical_efficient_frontier(mu, sigma, target_returns)
 
     # Rysowanie wykresu porównawczego
+    import os
+    os.makedirs('graphs/benchmark', exist_ok=True)
     plt.figure(figsize=(10, 6))
     plt.plot(frontier_volatility, target_returns, 'b-', linewidth=2, label='Granica numeryczna (w >= 0)')
     plt.plot(analytical_volatility, target_returns, 'g--', linewidth=2, label='Granica analityczna Lagrange\'a (krótka sprzedaż dozwolona)')
-    plt.scatter(min_var_vol, min_var_ret, color='r', s=80, zorder=5, label='Portfel min. wariancji (numeryczny)')
+    plt.scatter(min_var_vol, min_var_ret, color='r', marker='*', s=200, zorder=5, label='Portfel min. wariancji (numeryczny)')
     plt.title('Porównanie klasycznych granic efektywnych Markowitza')
     plt.xlabel('Roczna zmienność (odchylenie standardowe)')
     plt.ylabel('Roczna oczekiwana stopa zwrotu')
     plt.legend()
     plt.grid(True, alpha=0.3)
-    plt.show()
+    plt.savefig('graphs/benchmark/markowitz_efficient_frontier.png', dpi=150, bbox_inches='tight')
+    plt.close()
+    print("[Wykresy] Zapisano: graphs/benchmark/markowitz_efficient_frontier.png")
