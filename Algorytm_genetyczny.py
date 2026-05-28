@@ -14,6 +14,9 @@ mu = data_loader.mu
 sigma = data_loader.sigma
 num_stocks = len(mu)
 
+AG_GRAPHS_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'ag_graphs')
+os.makedirs(AG_GRAPHS_DIR, exist_ok=True)
+
 if __name__ == "__main__":
     print(f"Liczba akcji: {num_stocks}")
     print(f"Średnie zwroty:\n{mu}")
@@ -45,13 +48,13 @@ def dekoduj_chromosom(population: np.ndarray,
     Zastępuje powolne pętle operacjami macierzowymi w NumPy (przyspieszenie ok. 100x).
     """
     denom = float(2 ** bits_per_gene - 1)
-    
+
     # Zmiana kształtu na (pop_size, num_assets, bits_per_gene)
     reshaped = population.reshape((pop_size, num_assets, bits_per_gene))
-    
+
     # Przygotowanie potęg dwójki dla reprezentacji MSB-first
     powers = 2 ** np.arange(bits_per_gene - 1, -1, -1, dtype=float)
-    
+
     # Wektorowe wyznaczenie wartości rzeczywistych
     raw = np.sum(reshaped * powers, axis=2) / denom
 
@@ -484,24 +487,24 @@ def uruchamianie_optymalizacji_portfela():
         result['history_f'],
         result['history_best_f'],
         "Optymalizacja portfela (AG): zbieżność funkcji celu",
-        filename='portfolio_ag_convergence.png'
+        filename=os.path.join(AG_GRAPHS_DIR, 'portfolio_ag_convergence.png')
     )
 
     plot_weights(
         result['best_weights'],
         f"Optymalne wagi portfela AG (zwrot={result['best_return']:.4f}, ryzyko={result['best_risk']:.4f})",
-        filename='portfolio_ag_weights.png'
+        filename=os.path.join(AG_GRAPHS_DIR, 'portfolio_ag_weights.png')
     )
 
     plot_efficient_frontier_with_result(
         mu, sigma, result, n_points=40,
-        filename='portfolio_ag_efficient_frontier.png'
+        filename=os.path.join(AG_GRAPHS_DIR, 'portfolio_ag_efficient_frontier.png')
     )
 
     plot_weight_evolution(
         result['history_best_w'],
         "Ewolucja wag najlepszego osobnika przez pokolenia",
-        filename='portfolio_ag_weight_evolution.png'
+        filename=os.path.join(AG_GRAPHS_DIR, 'portfolio_ag_weight_evolution.png')
     )
 
     # --- Porównanie współczynników mutacji ---
@@ -518,7 +521,7 @@ def uruchamianie_optymalizacji_portfela():
         bits_per_gene=16,
         K=200,
         p_muts=[0.001, 0.005, 0.01, 0.03],
-        filename='portfolio_ag_mutation_comparison.png'
+        filename=os.path.join(AG_GRAPHS_DIR, 'portfolio_ag_mutation_comparison.png')
     )
 
     return result
