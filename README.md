@@ -63,9 +63,3 @@ Z przeprowadzonej analizy wynika, że:
 2. **SA** osiąga lepsze wartości funkcji celu (niższe ryzyko przy założonej stopie zwrotu).
 3. Oba algorytmy skutecznie zbliżają się do **numerycznej granicy efektywnej Markowitza**.
 
-### Przykładowe wizualizacje
-
-| Zbieżność algorytmów | Granica efektywna |
-| :---: | :---: |
-| ![Zbieżność](porownanie_zbieznosci.png) | ![Granica](porownanie_granica.png) |
-
