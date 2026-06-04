@@ -340,8 +340,7 @@ def save_markdown_tables(sa_results, ga_results, sens_results):
     lines = []
     lines.append("# Raport Wyników Optymalizacji Portfela WIG15\n")
     lines.append(
-        "_Wygenerowano automatycznie przez `Analiza_porownawcza.py` "
-        f"(Osoba 4: Integrator i Analityk)._\n"
+        "_Wygenerowano automatycznie przez `Analiza_porownawcza.py`._\n"
     )
     lines.append(
         f"> **Parametry eksperymentu:** TARGET_RETURN = {TARGET_RETURN*100:.0f}%,"
@@ -383,7 +382,7 @@ def save_markdown_tables(sa_results, ga_results, sens_results):
     lines.append("")
 
     # Tabela 3: Analiza wrażliwości
-    lines.append("## 3. Analiza Wrażliwości (5 niezależnych ziaren losowości)\n")
+    lines.append("## 3. Analiza wrażliwości (5 niezależnych ziaren losowości)\n")
     lines.append(
         "Walidacja stabilności najlepszych konfiguracji na 5 różnych seedach.\n"
     )
@@ -397,7 +396,7 @@ def save_markdown_tables(sa_results, ga_results, sens_results):
     lines.append("")
 
     # Tabela 4: Optymalne wagi portfeli
-    lines.append("## 4. Optymalne Wagi Portfeli\n")
+    lines.append("## 4. Optymalne wagi portfeli\n")
     lines.append(
         f"Zestawienie alokacji kapitału dla najlepszych konfiguracji:"
         f" SA (α = {best_sa_alpha}) i GA (pop_size = {best_ga_pop}).\n"
