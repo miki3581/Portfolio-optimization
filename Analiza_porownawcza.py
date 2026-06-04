@@ -145,7 +145,7 @@ def run_sensitivity_analysis(mu, sigma, sa_alpha, ga_pop, n_seeds=5):
     ga_fs  = []
 
     print(
-        f"\n[Analiza Wrażliwości] SA(alpha={sa_alpha}) vs GA(pop={ga_pop}), "
+        f"\n[Analiza wrażliwości] SA(alpha={sa_alpha}) vs GA(pop={ga_pop}), "
         f"{n_seeds} ziaren losowości ..."
     )
 
@@ -471,7 +471,7 @@ if __name__ == "__main__":
     print(f"\n  Najlepszy alpha SA : {best_sa_alpha}")
     print(f"  Najlepszy pop_size GA : {best_ga_pop}")
 
-    # 3. Analiza Wrażliwości
+    # 3. Analiza wrażliwości
     sens_res = run_sensitivity_analysis(mu, sigma, best_sa_alpha, best_ga_pop)
 
     # 4. Wykresy porównawcze
