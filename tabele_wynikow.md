@@ -1,6 +1,6 @@
 # Raport Wyników Optymalizacji Portfela WIG15
 
-_Wygenerowano automatycznie przez `Analiza_porownawcza.py` (Osoba 4: Integrator i Analityk)._
+_Wygenerowano automatycznie przez `Analiza_porownawcza.py`._
 
 > **Parametry eksperymentu:** TARGET_RETURN = 15%, PENALTY = 500.0, RNG_SEED = 16
 
@@ -26,7 +26,7 @@ Testowano wpływ wielkości populacji $pop\_size$ przy 250 pokoleniach, bits_per
 | 150 ★ | 0.035123 | 19.73% | 18.74% | 4.046 |
 | 300 | 0.035561 | 19.13% | 18.86% | 8.136 |
 
-## 3. Analiza Wrażliwości (5 niezależnych ziaren losowości)
+## 3. Analiza wrażliwości (5 niezależnych ziaren losowości)
 
 Walidacja stabilności najlepszych konfiguracji na 5 różnych seedach.
 
@@ -35,7 +35,7 @@ Walidacja stabilności najlepszych konfiguracji na 5 różnych seedach.
 | SA | 0.034803 | 0.000011 | 0.034787 | 0.034821 |
 | GA | 0.035239 | 0.000213 | 0.035019 | 0.035628 |
 
-## 4. Optymalne Wagi Portfeli
+## 4. Optymalne wagi portfeli
 
 Zestawienie alokacji kapitału dla najlepszych konfiguracji: SA (α = 0.9) i GA (pop_size = 150).
 
